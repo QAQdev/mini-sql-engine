@@ -12,7 +12,7 @@ BufferPoolManager::BufferPoolManager(size_t pool_size, DiskManager *disk_manager
 }
 
 BufferPoolManager::~BufferPoolManager() {
-  for (auto page: page_table_) {
+  for (auto page : page_table_) {
     FlushPage(page.first);
   }
   delete[] pages_;

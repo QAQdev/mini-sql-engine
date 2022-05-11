@@ -80,4 +80,4 @@ private:
 using IndexSchema = Schema;
 using TableSchema = Schema;
 
-#endif  // MINISQL_TABLE_H
+#endif  // MINISQL_SCHEMA_H

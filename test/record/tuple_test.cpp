@@ -87,6 +87,67 @@ TEST(TupleTest, FieldSerializeDeserializeTest) {
   }
 }
 
+/**
+ * Test for column serialize and deserialize
+ */
+
+Column attrs[]= {
+    Column("id", TypeId::kTypeInt, 0, false, true),
+    Column("name", TypeId::kTypeInt, 1, false, false),
+    Column("account", TypeId::kTypeFloat, 2, false, false)
+};
+
+TEST(TupleTest, ColumnSerializeDeserializeTest) {
+  char buffer[PAGE_SIZE];
+  memset(buffer, 0, sizeof(buffer));
+  // Serialize phase
+  char *p = buffer;
+  MemHeap *heap = new SimpleMemHeap();
+
+  for (int i = 0; i < 3; i++) p += attrs[i].SerializeTo(p);
+
+  // Deserialize phase
+  uint32_t ofs = 0;
+  Column *df = nullptr;
+  for (int i = 0; i < 3; i++) {
+    ofs += Column::DeserializeFrom(buffer + ofs, df, heap);
+    EXPECT_EQ(df->GetName(), attrs[i].GetName());
+    EXPECT_EQ(df->GetType(), attrs[i].GetType());
+    EXPECT_EQ(df->GetTableInd(), attrs[i].GetTableInd());
+    EXPECT_EQ(df->IsNullable(), attrs[i].IsNullable());
+    EXPECT_EQ(df->IsUnique(), attrs[i].IsUnique());
+  }
+}
+
+/**
+ * Test for row serialize and deserialize
+ */
+
+TEST(TupleTest, RowSerializeDeserializeTest) {
+  char buffer[PAGE_SIZE];
+  memset(buffer, 0, sizeof(buffer));
+  // Serialize phase
+  SimpleMemHeap heap;
+
+  std::vector<Column *> columns = {ALLOC_COLUMN(heap)("id", TypeId::kTypeInt, 0, false, false),
+                                   ALLOC_COLUMN(heap)("name", TypeId::kTypeChar, 64, 1, true, false),
+                                   ALLOC_COLUMN(heap)("account", TypeId::kTypeFloat, 2, true, false)};
+  std::vector<Field> fields = {Field(TypeId::kTypeInt, 188),
+                               Field(TypeId::kTypeChar, const_cast<char *>("minisql"), strlen("minisql"), false),
+                               Field(TypeId::kTypeFloat, 19.99f)};
+
+  Row row(fields);
+  Schema schema(columns);
+
+  row.SerializeTo(buffer, &schema);
+
+  // Deserialize phase
+  row.DeserializeFrom(buffer, &schema);
+  for (int i = 0; i < 3; i++) {
+    EXPECT_EQ(CmpBool::kTrue, row.GetField(i)->CompareEquals(fields[i]));
+  }
+}
+
 TEST(TupleTest, RowTest) {
   SimpleMemHeap heap;
   TablePage table_page;

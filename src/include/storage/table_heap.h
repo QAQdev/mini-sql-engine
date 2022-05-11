@@ -10,17 +10,17 @@
 class TableHeap {
   friend class TableIterator;
 
-public:
+ public:
   static TableHeap *Create(BufferPoolManager *buffer_pool_manager, Schema *schema, Transaction *txn,
                            LogManager *log_manager, LockManager *lock_manager, MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(TableHeap));
-    return new(buf) TableHeap(buffer_pool_manager, schema, txn, log_manager, lock_manager);
+    return new (buf) TableHeap(buffer_pool_manager, schema, txn, log_manager, lock_manager);
   }
 
   static TableHeap *Create(BufferPoolManager *buffer_pool_manager, page_id_t first_page_id, Schema *schema,
                            LogManager *log_manager, LockManager *lock_manager, MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(TableHeap));
-    return new(buf) TableHeap(buffer_pool_manager, first_page_id, schema, log_manager, lock_manager);
+    return new (buf) TableHeap(buffer_pool_manager, first_page_id, schema, log_manager, lock_manager);
   }
 
   ~TableHeap() {}
@@ -92,16 +92,16 @@ public:
    */
   inline page_id_t GetFirstPageId() const { return first_page_id_; }
 
-private:
+ private:
   /**
    * create table heap and initialize first page
    */
-  explicit TableHeap(BufferPoolManager *buffer_pool_manager, Schema *schema, Transaction *txn,
-                     LogManager *log_manager, LockManager *lock_manager) :
-          buffer_pool_manager_(buffer_pool_manager),
-          schema_(schema),
-          log_manager_(log_manager),
-          lock_manager_(lock_manager) {
+  explicit TableHeap(BufferPoolManager *buffer_pool_manager, Schema *schema, Transaction *txn, LogManager *log_manager,
+                     LockManager *lock_manager)
+      : buffer_pool_manager_(buffer_pool_manager),
+        schema_(schema),
+        log_manager_(log_manager),
+        lock_manager_(lock_manager) {
     ASSERT(false, "Not implemented yet.");
   };
 
@@ -110,13 +110,13 @@ private:
    */
   explicit TableHeap(BufferPoolManager *buffer_pool_manager, page_id_t first_page_id, Schema *schema,
                      LogManager *log_manager, LockManager *lock_manager)
-          : buffer_pool_manager_(buffer_pool_manager),
-            first_page_id_(first_page_id),
-            schema_(schema),
-            log_manager_(log_manager),
-            lock_manager_(lock_manager) {}
+      : buffer_pool_manager_(buffer_pool_manager),
+        first_page_id_(first_page_id),
+        schema_(schema),
+        log_manager_(log_manager),
+        lock_manager_(lock_manager) {}
 
-private:
+ private:
   BufferPoolManager *buffer_pool_manager_;
   page_id_t first_page_id_;
   Schema *schema_;

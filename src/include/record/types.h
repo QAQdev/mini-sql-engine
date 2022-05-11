@@ -19,7 +19,7 @@ enum CmpBool {
 inline CmpBool GetCmpBool(bool boolean) { return boolean ? CmpBool::kTrue : CmpBool::kFalse; }
 
 class Type {
-public:
+ public:
   explicit Type(TypeId type_id) : type_id_(type_id) {}
 
   virtual ~Type() = default;
@@ -38,13 +38,9 @@ public:
     throw "Unknown field type.";
   }
 
-  inline static Type *GetInstance(TypeId type_id) {
-    return type_singletons_[type_id];
-  }
+  inline static Type *GetInstance(TypeId type_id) { return type_singletons_[type_id]; }
 
-  inline TypeId GetTypeId() {
-    return type_id_;
-  }
+  inline TypeId GetTypeId() { return type_id_; }
 
   // Serialize this field into the given storage space.
   virtual uint32_t SerializeTo(const Field &field, char *buf) const;
@@ -73,7 +69,7 @@ public:
 
   virtual CmpBool CompareGreaterThanEquals(const Field &left, const Field &right) const;
 
-protected:
+ protected:
   TypeId type_id_{TypeId::kTypeInvalid};
   static Type *type_singletons_[TypeId::KMaxTypeId + 1];
 };

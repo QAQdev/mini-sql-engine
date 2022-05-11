@@ -5,10 +5,9 @@
 #ifndef MINISQL_CLOCK_REPLACER_H
 #define MINISQL_CLOCK_REPLACER_H
 
-#include <list>
 #include <mutex>
-#include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 #include "buffer/replacer.h"
 #include "common/config.h"
@@ -16,6 +15,15 @@
 using namespace std;
 
 class ClockReplacer: public Replacer {
+ private:
+  /**
+   * @brief state of the frame
+   * if pin -> EMPTY
+   * if unpin -> ACCESSED
+   * after ACCESSED -> UNUSED
+   */
+  enum class State { EMPTY, ACCESSED, UNUSED };
+
  public:
   /**
    * Create a new ClockReplacer.
@@ -37,6 +45,11 @@ class ClockReplacer: public Replacer {
   size_t Size() override;
 
  private:
+  static bool IsEmpty(ClockReplacer::State &);
+
+ private:
+  std::vector<State> second_chance;
+  frame_id_t pointer{0};
   size_t capacity;
 };
 

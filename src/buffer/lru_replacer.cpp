@@ -40,7 +40,7 @@ void LRUReplacer::Unpin(frame_id_t frame_id) {
   if (itr != mapping.end()) return;
 
   visit_lst.push_back(frame_id);
-  mapping.insert(pair<frame_id_t, std::list<frame_id_t>::iterator>(frame_id, std::prev(visit_lst.end(), 1)));
+  mapping.insert(pair<frame_id_t, list<frame_id_t>::iterator>(frame_id, prev(visit_lst.end(), 1)));
 }
 
 size_t LRUReplacer::Size() { return mapping.size(); }

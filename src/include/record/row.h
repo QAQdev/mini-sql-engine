@@ -1,6 +1,8 @@
 #ifndef MINISQL_ROW_H
 #define MINISQL_ROW_H
 
+#include <bitset>
+
 #include <memory>
 #include <vector>
 #include "common/macros.h"
@@ -22,7 +24,7 @@
  *
  */
 class Row {
-public:
+ public:
   /**
    * Row used for insert
    * Field integrity should check by upper level
@@ -31,8 +33,10 @@ public:
     // deep copy
     for (auto &field : fields) {
       void *buf = heap_->Allocate(sizeof(Field));
-      fields_.push_back(new(buf)Field(field));
+      fields_.push_back(new (buf) Field(field));
     }
+
+    fields_nums = fields.size();
   }
 
   /**
@@ -58,13 +62,13 @@ public:
     rid_ = other.rid_;
     for (auto &field : other.fields_) {
       void *buf = heap_->Allocate(sizeof(Field));
-      fields_.push_back(new(buf)Field(*field));
+      fields_.push_back(new (buf) Field(*field));
     }
+
+    fields_nums = other.fields_nums;
   }
 
-  virtual ~Row() {
-    delete heap_;
-  }
+  virtual ~Row() { delete heap_; }
 
   /**
    * Note: Make sure that bytes write to buf is equal to GetSerializedSize()
@@ -93,13 +97,15 @@ public:
 
   inline size_t GetFieldCount() const { return fields_.size(); }
 
-private:
+ private:
   Row &operator=(const Row &other) = delete;
 
-private:
+ private:
   RowId rid_{};
-  std::vector<Field *> fields_;   /** Make sure that all fields are created by mem heap */
+  std::vector<Field *> fields_; /** Make sure that all fields are created by mem heap */
   MemHeap *heap_{nullptr};
+
+  uint32_t fields_nums{0};
 };
 
 #endif //MINISQL_TUPLE_H
