@@ -2,6 +2,7 @@
 #define MINISQL_ROW_H
 
 #include <bitset>
+#include <map>
 
 #include <memory>
 #include <vector>
@@ -34,6 +35,7 @@ class Row {
     for (auto &field : fields) {
       void *buf = heap_->Allocate(sizeof(Field));
       fields_.push_back(new (buf) Field(field));
+      if (field.IsNull()) null_nums++;
     }
 
     fields_nums = fields.size();
@@ -63,6 +65,7 @@ class Row {
     for (auto &field : other.fields_) {
       void *buf = heap_->Allocate(sizeof(Field));
       fields_.push_back(new (buf) Field(*field));
+      if (field->IsNull()) null_nums++;
     }
 
     fields_nums = other.fields_nums;
@@ -106,6 +109,8 @@ class Row {
   MemHeap *heap_{nullptr};
 
   uint32_t fields_nums{0};
+  uint32_t null_nums{0};
+//  std::bitset<PAGE_SIZE>null_bitmap;
 };
 
 #endif //MINISQL_TUPLE_H

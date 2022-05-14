@@ -102,7 +102,13 @@ class TableHeap {
         schema_(schema),
         log_manager_(log_manager),
         lock_manager_(lock_manager) {
-    ASSERT(false, "Not implemented yet.");
+    // initialize the first table page for the table heap
+    auto first_page = (TablePage *)(buffer_pool_manager_->NewPage(first_page_id_));
+    ASSERT(first_page != nullptr, "Can not initialize the first page for table heap.");
+    first_page->Init(first_page_id_, INVALID_PAGE_ID, log_manager_, txn);
+
+    // first created, need to write to disk, so it's dirty
+    buffer_pool_manager_->UnpinPage(first_page_id_, true);
   };
 
   /**

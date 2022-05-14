@@ -139,10 +139,11 @@ TEST(TupleTest, RowSerializeDeserializeTest) {
   Row row(fields);
   Schema schema(columns);
 
-  row.SerializeTo(buffer, &schema);
+  uint32_t ofs_to = row.SerializeTo(buffer, &schema);
 
   // Deserialize phase
-  row.DeserializeFrom(buffer, &schema);
+  uint32_t ofs_from = row.DeserializeFrom(buffer, &schema);
+  ASSERT_TRUE(ofs_to == ofs_from);
   for (int i = 0; i < 3; i++) {
     EXPECT_EQ(CmpBool::kTrue, row.GetField(i)->CompareEquals(fields[i]));
   }
@@ -157,6 +158,7 @@ TEST(TupleTest, RowTest) {
           ALLOC_COLUMN(heap)("name", TypeId::kTypeChar, 64, 1, true, false),
           ALLOC_COLUMN(heap)("account", TypeId::kTypeFloat, 2, true, false)
   };
+
   std::vector<Field> fields = {
           Field(TypeId::kTypeInt, 188),
           Field(TypeId::kTypeChar, const_cast<char *>("minisql"), strlen("minisql"), false),

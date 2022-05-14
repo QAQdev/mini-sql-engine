@@ -27,7 +27,10 @@
 #include "transaction/transaction.h"
 
 class TablePage : public Page {
-public:
+ public:
+  enum class RetState { ILLEGAL_CALL, INSUFFICIENT_TABLE_PAGE,DOUBLE_DELETE,SUCCESS };
+
+ public:
   void Init(page_id_t page_id, page_id_t prev_id, LogManager *log_mgr, Transaction *txn);
 
   page_id_t GetTablePageId() { return *reinterpret_cast<page_id_t *>(GetData()); }
@@ -48,8 +51,8 @@ public:
 
   bool MarkDelete(const RowId &rid, Transaction *txn, LockManager *lock_manager, LogManager *log_manager);
 
-  bool UpdateTuple(const Row &new_row, Row *old_row, Schema *schema,
-                   Transaction *txn, LockManager *lock_manager, LogManager *log_manager);
+  RetState UpdateTuple(const Row &new_row, Row *old_row, Schema *schema, Transaction *txn, LockManager *lock_manager,
+                       LogManager *log_manager);
 
   void ApplyDelete(const RowId &rid, Transaction *txn, LogManager *log_manager);
 
@@ -61,7 +64,7 @@ public:
 
   bool GetNextTupleRid(const RowId &cur_rid, RowId *next_rid);
 
-private:
+ private:
   uint32_t GetFreeSpacePointer() { return *reinterpret_cast<uint32_t *>(GetData() + OFFSET_FREE_SPACE); }
 
   void SetFreeSpacePointer(uint32_t free_space_pointer) {
@@ -98,7 +101,7 @@ private:
 
   static uint32_t UnsetDeletedFlag(uint32_t tuple_size) { return static_cast<uint32_t>(tuple_size & (~DELETE_MASK)); }
 
-private:
+ private:
   static_assert(sizeof(page_id_t) == 4);
   static constexpr uint64_t DELETE_MASK = (1U << (8 * sizeof(uint32_t) - 1));
   static constexpr size_t SIZE_TABLE_PAGE_HEADER = 24;
@@ -110,7 +113,7 @@ private:
   static constexpr size_t OFFSET_TUPLE_OFFSET = 24;
   static constexpr size_t OFFSET_TUPLE_SIZE = 28;
 
-public:
+ public:
   static constexpr size_t SIZE_MAX_ROW = PAGE_SIZE - SIZE_TABLE_PAGE_HEADER - SIZE_TUPLE;
 };
 
