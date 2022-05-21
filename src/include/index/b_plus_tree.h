@@ -25,8 +25,10 @@
  */
 INDEX_TEMPLATE_ARGUMENTS
 class BPlusTree {
-  using InternalPage = BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>;
-  using LeafPage = BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>;
+  using InternalPage 
+  = BPlusTreeInternalPage<KeyType, page_id_t, KeyComparator>;
+  using LeafPage 
+  = BPlusTreeLeafPage<KeyType, ValueType, KeyComparator>;
 
 public:
   explicit BPlusTree(index_id_t index_id, BufferPoolManager *buffer_pool_manager, const KeyComparator &comparator,
@@ -53,14 +55,20 @@ public:
   // expose for test purpose
   Page *FindLeafPage(const KeyType &key, bool leftMost = false);
 
+  // hz
+  // 'L' for leftmost, 'M for simple search, 'R for rightmost
+  Page *FindLeafPage(const KeyType &key, char target_location);
+
   // used to check whether all pages are unpinned
   bool Check();
 
   // destroy the b plus tree
   void Destroy();
 
-  void PrintTree(std::ofstream &out) {
-    if (IsEmpty()) {
+  void PrintTree(std::ofstream &out) 
+  {
+    if (IsEmpty()) 
+    {
       return;
     }
     out << "digraph G {" << std::endl;
@@ -107,6 +115,10 @@ private:
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+
+  // new added -- @hz
+  std::vector<page_id_t> delete_pages;
+  void ClrDeletePages();
 };
 
 #endif  // MINISQL_B_PLUS_TREE_H

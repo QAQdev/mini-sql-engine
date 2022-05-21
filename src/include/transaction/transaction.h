@@ -6,7 +6,8 @@
  *
  * Implemented by student self
 */
-class Transaction {
+class Transaction 
+{
 
 };
 
