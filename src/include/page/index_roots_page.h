@@ -4,6 +4,7 @@
 #include <string>
 
 #include "common/config.h"
+#include "page.h"
 
 /**
  * Database use the one as index roots page page to store all
@@ -14,7 +15,8 @@
  * | RecordCount (4) | Index_1 id (4) | Index_1 root_id (4) | ... |
  *  -----------------------------------------------------------------
  */
-class IndexRootsPage {
+class IndexRootsPage : public Page
+{
 public:
   void Init() {
     count_ = 0;
