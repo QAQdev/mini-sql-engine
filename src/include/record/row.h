@@ -80,11 +80,11 @@ class Row {
 
   uint32_t DeserializeFrom(char *buf, Schema *schema);
 
-  /**
-   * For empty row, return 0
-   * For non-empty row with null fields, eg: |null|null|null|, return header size only
-   * @return
-   */
+  /*************************************************************************************\
+   * For empty row, return 0                                                           *
+   * For non-empty row with null fields, eg: |null|null|null|, return header size only *
+   * @return                                                                           *
+  \*************************************************************************************/
   uint32_t GetSerializedSize(Schema *schema) const;
 
   inline const RowId GetRowId() const { return rid_; }

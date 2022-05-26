@@ -92,6 +92,16 @@ public:
     return Type::GetInstance(type_id_)->GetData(*this);
   }
 
+  inline int32_t GetInt() const 
+  {
+    return value_.integer_;
+  }
+
+  inline float GetFloat() const 
+  {
+    return value_.float_;
+  }
+
   inline uint32_t SerializeTo(char *buf) const {
     return Type::GetInstance(type_id_)->SerializeTo(*this, buf);
   }
@@ -108,7 +118,10 @@ public:
     return type_id_ == o.type_id_;
   }
 
-  inline CmpBool CompareEquals(const Field &o) const { return Type::GetInstance(type_id_)->CompareEquals(*this, o); }
+  inline CmpBool CompareEquals(const Field &o) const 
+  {
+    return Type::GetInstance(type_id_)->CompareEquals(*this, o); 
+  }
 
   inline CmpBool CompareNotEquals(const Field &o) const {
     return Type::GetInstance(type_id_)->CompareNotEquals(*this, o);

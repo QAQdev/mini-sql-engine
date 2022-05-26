@@ -78,6 +78,6 @@ private:
 };
 
 using IndexSchema = Schema;
-using TableSchema = Schema;
+using   TableSchema = Schema;
 
 #endif  // MINISQL_SCHEMA_H

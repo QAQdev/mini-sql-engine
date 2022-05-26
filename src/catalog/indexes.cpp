@@ -17,4 +17,4 @@ uint32_t IndexMetadata::GetSerializedSize() const {
 
 uint32_t IndexMetadata::DeserializeFrom(char *buf, IndexMetadata *&index_meta, MemHeap *heap) {
   return 0;
-}
+} 

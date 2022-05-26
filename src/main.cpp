@@ -4,7 +4,8 @@
 #include "parser/syntax_tree_printer.h"
 #include "utils/tree_file_mgr.h"
 
-extern "C" {
+extern "C" 
+{
 int yyparse(void);
 FILE *yyin;
 #include "parser/minisql_lex.h"
@@ -29,7 +30,8 @@ void InputCommand(char *input, const int len) {
   getchar();        // remove enter
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv) 
+{
   InitGoogleLog(argv[0]);
   // command buffer
   const int buf_size = 1024;
@@ -40,12 +42,14 @@ int main(int argc, char **argv) {
   TreeFileManagers syntax_tree_file_mgr("syntax_tree_");
   [[maybe_unused]] uint32_t syntax_tree_id = 0;
 
-  while (1) {
+  while (1) 
+  {
     // read from buffer
     InputCommand(cmd, buf_size);
     // create buffer for sql input
     YY_BUFFER_STATE bp = yy_scan_string(cmd);
-    if (bp == nullptr) {
+    if (bp == nullptr) 
+    {
       LOG(ERROR) << "Failed to create yy buffer state." << std::endl;
       exit(1);
     }
@@ -58,15 +62,19 @@ int main(int argc, char **argv) {
     yyparse();
 
     // parse result handle
-    if (MinisqlParserGetError()) {
+    if (MinisqlParserGetError()) 
+    {
       // error
       printf("%s\n", MinisqlParserGetErrorMessage());
-    } else {
-#ifdef ENABLE_PARSER_DEBUG
+    } 
+    else 
+    {
+// #ifdef ENABLE_PARSER_DEBUG
       printf("[INFO] Sql syntax parse ok!\n");
       SyntaxTreePrinter printer(MinisqlGetParserRootNode());
+      // MinisqlGetParserRootNode()->
       printer.PrintTree(syntax_tree_file_mgr[syntax_tree_id++]);
-#endif
+// #endif
     }
 
     ExecuteContext context;
@@ -79,7 +87,8 @@ int main(int argc, char **argv) {
     yylex_destroy();
 
     // quit condition
-    if (context.flag_quit_) {
+    if (context.flag_quit_) 
+    {
       printf("bye!\n");
       break;
     }
