@@ -15,7 +15,7 @@ TEST(TableHeapTest, TableHeapSampleTest) {
   // init testing instance
   DBStorageEngine engine(db_file_name);
   SimpleMemHeap heap;
-  const int row_nums = 130000;
+  const int row_nums = 200000;
   // create schema
   std::vector<Column *> columns = {ALLOC_COLUMN(heap)("id", TypeId::kTypeInt, 0, false, false),
                                    ALLOC_COLUMN(heap)("name", TypeId::kTypeChar, 64, 1, true, false),

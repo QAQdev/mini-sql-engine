@@ -36,7 +36,13 @@ private:
   IndexMetadata() = delete;
 
   explicit IndexMetadata(const index_id_t index_id, const std::string &index_name,
-                         const table_id_t table_id, const std::vector<uint32_t> &key_map) {}
+                         const table_id_t table_id, const std::vector<uint32_t> &key_map)
+      :index_id_(index_id),
+        index_name_(index_name),
+        table_id_ (table_id),
+        key_map_ (key_map) {
+
+  }
 
 private:
   static constexpr uint32_t INDEX_METADATA_MAGIC_NUM = 344528;
@@ -62,9 +68,14 @@ public:
 
   void Init(IndexMetadata *meta_data, TableInfo *table_info, BufferPoolManager *buffer_pool_manager) {
     // Step1: init index metadata and table info
+    this->table_info_ = table_info;
+    this->meta_data_ = meta_data;
     // Step2: mapping index key to key schema
+    auto schema = table_info->GetSchema();
+    this->key_schema_ = Schema::ShallowCopySchema(schema, meta_data->key_map_, heap_);
     // Step3: call CreateIndex to create the index
-    ASSERT(false, "Not Implemented yet.");
+    this->index_ = CreateIndex(buffer_pool_manager);
+    // ASSERT(false, "Not Implemented yet.");
   }
 
   inline Index *GetIndex() { return index_; }
@@ -82,7 +93,8 @@ private:
                          key_schema_{nullptr}, heap_(new SimpleMemHeap()) {}
 
   Index *CreateIndex(BufferPoolManager *buffer_pool_manager) {
-    ASSERT(false, "Not Implemented yet.");
+    //    ASSERT(false, "Not Implemented yet.");
+
     return nullptr;
   }
 

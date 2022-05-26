@@ -28,7 +28,6 @@ public:
 
   inline Schema *GetSchema() const { return schema_; }
 
-
 private:
   TableMetadata() = delete;
 
@@ -46,15 +45,13 @@ private:
  * The TableInfo class maintains metadata about a table.
  */
 class TableInfo {
-public:
+ public:
   static TableInfo *Create(MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(TableInfo));
-    return new(buf)TableInfo();
+    return new (buf) TableInfo();
   }
 
-  ~TableInfo() {
-    delete heap_;
-  }
+  ~TableInfo() { delete heap_; }
 
   void Init(TableMetadata *table_meta, TableHeap *table_heap) {
     table_meta_ = table_meta;
@@ -73,10 +70,10 @@ public:
 
   inline page_id_t GetRootPageId() const { return table_meta_->root_page_id_; }
 
-private:
-  explicit TableInfo() : heap_(new SimpleMemHeap()) {};
+ private:
+  explicit TableInfo() : heap_(new SimpleMemHeap()){};
 
-private:
+ private:
   TableMetadata *table_meta_;
   TableHeap *table_heap_;
   MemHeap *heap_; /** store all objects allocated in table_meta and table heap */

@@ -17,7 +17,7 @@
 class CatalogMeta {
   friend class CatalogManager;
 
-public:
+ public:
   void SerializeTo(char *buf) const;
 
   static CatalogMeta *DeserializeFrom(char *buf, MemHeap *heap);
@@ -25,36 +25,32 @@ public:
   uint32_t GetSerializedSize() const;
 
   inline table_id_t GetNextTableId() const {
-    return table_meta_pages_.size() == 0 ? 0 : table_meta_pages_.rbegin()->first;
+    return table_meta_pages_.size() == 0 ? 0 : table_meta_pages_.rbegin()->first + 1;
   }
 
   inline index_id_t GetNextIndexId() const {
-    return index_meta_pages_.size() == 0 ? 0 : index_meta_pages_.rbegin()->first;
+    return index_meta_pages_.size() == 0 ? 0 : index_meta_pages_.rbegin()->first + 1;
   }
 
   static CatalogMeta *NewInstance(MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(CatalogMeta));
-    return new(buf) CatalogMeta();
+    return new (buf) CatalogMeta();
   }
 
   /**
    * Used only for testing
    */
-  inline std::map<table_id_t, page_id_t> *GetTableMetaPages() {
-    return &table_meta_pages_;
-  }
+  inline std::map<table_id_t, page_id_t> *GetTableMetaPages() { return &table_meta_pages_; }
 
   /**
    * Used only for testing
    */
-  inline std::map<index_id_t, page_id_t> *GetIndexMetaPages() {
-    return &index_meta_pages_;
-  }
+  inline std::map<index_id_t, page_id_t> *GetIndexMetaPages() { return &index_meta_pages_; }
 
-private:
+ private:
   explicit CatalogMeta();
 
-private:
+ private:
   static constexpr uint32_t CATALOG_METADATA_MAGIC_NUM = 89849;
   std::map<table_id_t, page_id_t> table_meta_pages_;
   std::map<index_id_t, page_id_t> index_meta_pages_;

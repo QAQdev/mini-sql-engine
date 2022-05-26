@@ -32,7 +32,7 @@ uint32_t Column::SerializeTo(char *buf) const {
   MACH_WRITE_TO(uint32_t, buf, COLUMN_MAGIC_NUM);
   ofs += sizeof(uint32_t);
 
-  len = name_.size() * sizeof(char);  //bytes of string
+  len = name_.size() * sizeof(char);  // bytes of string
   memcpy(buf + ofs, &len, sizeof(uint32_t));
   ofs += sizeof(uint32_t);
   memcpy(buf + ofs, name_.c_str(), len);
@@ -53,7 +53,7 @@ uint32_t Column::SerializeTo(char *buf) const {
 }
 
 uint32_t Column::GetSerializedSize() const {
-  return 3 * sizeof(uint32_t) + name_.size() * sizeof(char) + sizeof(TypeId) + 2 * sizeof(bool);
+  return 4 * sizeof(uint32_t) + name_.size() * sizeof(char) + sizeof(TypeId) + 2 * sizeof(bool);
 }
 
 uint32_t Column::DeserializeFrom(char *buf, Column *&column, MemHeap *heap) {
@@ -82,7 +82,7 @@ uint32_t Column::DeserializeFrom(char *buf, Column *&column, MemHeap *heap) {
   auto unique_ = MACH_READ_FROM(bool, buf + ofs);
   ofs += sizeof(bool);
 
-  if (len_ != 0)  // not char type
+  if (type_ != kTypeChar)  // not char type
     column = ALLOC_P(heap, Column)(name_, type_, table_ind_, nullable_, unique_);
   else
     column = ALLOC_P(heap, Column)(name_, type_, len_, table_ind_, nullable_, unique_);
