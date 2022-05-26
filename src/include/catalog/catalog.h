@@ -61,9 +61,9 @@ class CatalogMeta {
  *
  */
 class CatalogManager {
-public:
-  explicit CatalogManager(BufferPoolManager *buffer_pool_manager, LockManager *lock_manager,
-                          LogManager *log_manager, bool init);
+ public:
+  explicit CatalogManager(BufferPoolManager *buffer_pool_manager, LockManager *lock_manager, LogManager *log_manager,
+                          bool init);
 
   ~CatalogManager();
 
@@ -74,8 +74,7 @@ public:
   dberr_t GetTables(std::vector<TableInfo *> &tables) const;
 
   dberr_t CreateIndex(const std::string &table_name, const std::string &index_name,
-                      const std::vector<std::string> &index_keys, Transaction *txn,
-                      IndexInfo *&index_info);
+                      const std::vector<std::string> &index_keys, Transaction *txn, IndexInfo *&index_info);
 
   dberr_t GetIndex(const std::string &table_name, const std::string &index_name, IndexInfo *&index_info) const;
 
@@ -85,7 +84,7 @@ public:
 
   dberr_t DropIndex(const std::string &table_name, const std::string &index_name);
 
-private:
+ private:
   dberr_t FlushCatalogMetaPage() const;
 
   dberr_t LoadTable(const table_id_t table_id, const page_id_t page_id);
@@ -94,7 +93,7 @@ private:
 
   dberr_t GetTable(const table_id_t table_id, TableInfo *&table_info);
 
-private:
+ private:
   [[maybe_unused]] BufferPoolManager *buffer_pool_manager_;
   [[maybe_unused]] LockManager *lock_manager_;
   [[maybe_unused]] LogManager *log_manager_;

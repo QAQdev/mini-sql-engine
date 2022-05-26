@@ -29,6 +29,7 @@ public:
   inline Schema *GetSchema() const { return schema_; }
 
 private:
+
   TableMetadata() = delete;
 
   TableMetadata(table_id_t table_id, std::string table_name, page_id_t root_page_id, TableSchema *schema);

@@ -56,6 +56,7 @@ TableIterator TableIterator::operator++(int) {  // postfix
    * end of the cur page, we get no valid row after current row,
    * we need to look for the next page and move to it
    */
+
   if (!cur_page->GetNextTupleRid(row->GetRowId(), &next_row_id)) {
     while (cur_page->GetPageId() != INVALID_PAGE_ID) {
       next_page = (TablePage *)table_heap->buffer_pool_manager_->FetchPage(cur_page->GetNextPageId());

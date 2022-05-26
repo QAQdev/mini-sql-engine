@@ -93,9 +93,14 @@ private:
                          key_schema_{nullptr}, heap_(new SimpleMemHeap()) {}
 
   Index *CreateIndex(BufferPoolManager *buffer_pool_manager) {
-    //    ASSERT(false, "Not Implemented yet.");
-
-    return nullptr;
+    // ASSERT(false, "Not Implemented yet.");
+    // index_ = new BPlusTreeIndex<, RowId, >(meta_data_->GetIndexId(), key_schema_, buffer_pool_manager);
+    using INDEX_KEY_TYPE = GenericKey<64>;
+    using INDEX_COMPARATOR_TYPE = GenericComparator<64>;
+    using BP_TREE_INDEX = BPlusTreeIndex<INDEX_KEY_TYPE, RowId, INDEX_COMPARATOR_TYPE>;
+    this->index_ = ALLOC((*heap_), BP_TREE_INDEX)(0, key_schema_, buffer_pool_manager);
+    return this->index_;
+    // return nullptr;
   }
 
 private:

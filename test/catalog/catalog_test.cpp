@@ -105,18 +105,34 @@ TEST(CatalogTest, CatalogTableOperationTest) {
   auto schema = std::make_shared<Schema>(columns);
   Transaction txn;
   catalog_01->CreateTable("table-1", schema.get(), &txn, table_info);
+
+  TableInfo *table_info01 = nullptr;
+  catalog_01->CreateTable("table-3", schema.get(), &txn, table_info01);
   ASSERT_TRUE(table_info != nullptr);
-  TableInfo *table_info_02 = nullptr;
+  ASSERT_TRUE(table_info01 != nullptr);
+
+  TableInfo *table_info_02 = nullptr, *table_info04 = nullptr;
   ASSERT_EQ(DB_SUCCESS, catalog_01->GetTable("table-1", table_info_02));
   ASSERT_EQ(table_info, table_info_02);
+
+  ASSERT_EQ(DB_SUCCESS, catalog_01->GetTable("table-3", table_info04));
+  ASSERT_EQ(table_info01, table_info04);
+
+  // Test if the table is dropped and page is truly deleted
+  auto page_id = table_info04->GetRootPageId();
+  ASSERT_EQ(DB_SUCCESS, catalog_01->DropTable("table-3"));
+  ASSERT_EQ(true, db_01->bpm_->IsPageFree(page_id));
+
   auto *table_heap = table_info->GetTableHeap();
   ASSERT_TRUE(table_heap != nullptr);
   delete db_01;
+
   /** Stage 2: Testing catalog loading */
   auto db_02 = new DBStorageEngine(db_file_name, false);
   auto &catalog_02 = db_02->catalog_mgr_;
   TableInfo *table_info_03 = nullptr;
   ASSERT_EQ(DB_TABLE_NOT_EXIST, catalog_02->GetTable("table-2", table_info_03));
+  ASSERT_EQ(DB_TABLE_NOT_EXIST, catalog_02->GetTable("table-3", table_info_03));
   ASSERT_EQ(DB_SUCCESS, catalog_02->GetTable("table-1", table_info_03));
   delete db_02;
 }

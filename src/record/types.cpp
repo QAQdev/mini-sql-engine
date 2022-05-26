@@ -75,6 +75,7 @@ CmpBool Type::CompareGreaterThan(const Field &left, const Field &right) const {
 
 CmpBool Type::CompareGreaterThanEquals(const Field &left, const Field &right) const {
   ASSERT(false, "CompareGreaterThanEquals not implemented.");
+
   return kNull;
 }
 
