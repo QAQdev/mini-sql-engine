@@ -6,6 +6,7 @@ BufferPoolManager::BufferPoolManager(size_t pool_size, DiskManager *disk_manager
         : pool_size_(pool_size), disk_manager_(disk_manager) {
   pages_ = new Page[pool_size_];
   replacer_ = new LRUReplacer(pool_size_);
+  //  replacer_ = new ClockReplacer(pool_size_);
   for (size_t i = 0; i < pool_size_; i++) {
     free_list_.emplace_back(i);
   }
@@ -54,8 +55,8 @@ Page *BufferPoolManager::FetchPage(page_id_t page_id) {
     page_frame->is_dirty_ = false;
   }
 
-  page_table_.erase(page_frame->page_id_);                                  // erase dirty
-  page_table_.insert(pair<page_id_t, frame_id_t>(page_id, frame_id)); // insert new
+  page_table_.erase(page_frame->page_id_);                             // erase dirty
+  page_table_.insert(pair<page_id_t, frame_id_t>(page_id, frame_id));  // insert new
 
   page_frame->page_id_ = page_id;
   page_frame->pin_count_++;  // page gets pinned
@@ -75,10 +76,12 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
 
   size_t i = 0;
   for (i = 0; i < pool_size_; i++) {
-    if (pages_[i].GetPinCount() == 0) break;
+    if (pages_[i].GetPinCount() <= 0) break;
   }
 
-  if (i == pool_size_) return nullptr;
+  if (i == pool_size_) {
+    return nullptr;
+  }
 
   frame_id_t frame_id;
   Page *page_frame;
@@ -88,7 +91,9 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
     frame_id = free_list_.front();
     free_list_.pop_front();
   } else {
-    if (!replacer_->Victim(&frame_id)) return nullptr;
+    if (!replacer_->Victim(&frame_id)) {
+      return nullptr;
+    }
   }
 
   page_frame = &pages_[frame_id];
@@ -106,8 +111,6 @@ Page *BufferPoolManager::NewPage(page_id_t &page_id) {
   page_frame->ResetMemory();  // memset 0
   page_frame->pin_count_++;   // page gets pinned
   replacer_->Pin(frame_id);
-
-  disk_manager_->ReadPage(page_frame->page_id_, page_frame->data_);  // load data
 
   page_id = new_page_id;
   return page_frame;
@@ -130,7 +133,7 @@ bool BufferPoolManager::DeletePage(page_id_t page_id) {
   page_frame = &pages_[frame_id];
 
   // pin count non zero, return false
-  if (page_frame->pin_count_ != 0) return false;
+  if (page_frame->pin_count_ > 0) return false;
 
   if (page_frame->IsDirty()) {
     disk_manager_->WritePage(page_frame->page_id_, page_frame->data_);
@@ -139,7 +142,7 @@ bool BufferPoolManager::DeletePage(page_id_t page_id) {
 
   // zero
   page_table_.erase(page_frame->page_id_);
-  disk_manager_->DeAllocatePage(page_frame->page_id_);
+  DeallocatePage(page_frame->page_id_);
 
   page_frame->ResetMemory();
   page_frame->page_id_ = INVALID_PAGE_ID;
@@ -161,10 +164,10 @@ bool BufferPoolManager::UnpinPage(page_id_t page_id, bool is_dirty) {
   frame_id = item_itr->second;
   page_frame = &pages_[frame_id];
 
-  if (page_frame->pin_count_ == 0) return false;
+  page_frame->is_dirty_ = is_dirty;
 
+  if (page_frame->pin_count_ == 0) return false;
   page_frame->pin_count_--;
-  page_frame->is_dirty_ |= is_dirty;
 
   if (page_frame->pin_count_ == 0) replacer_->Unpin(frame_id);
 

@@ -17,7 +17,7 @@
 class CatalogMeta {
   friend class CatalogManager;
 
-public:
+ public:
   void SerializeTo(char *buf) const;
 
   static CatalogMeta *DeserializeFrom(char *buf, MemHeap *heap);
@@ -25,36 +25,32 @@ public:
   uint32_t GetSerializedSize() const;
 
   inline table_id_t GetNextTableId() const {
-    return table_meta_pages_.size() == 0 ? 0 : table_meta_pages_.rbegin()->first;
+    return table_meta_pages_.size() == 0 ? 0 : table_meta_pages_.rbegin()->first + 1;
   }
 
   inline index_id_t GetNextIndexId() const {
-    return index_meta_pages_.size() == 0 ? 0 : index_meta_pages_.rbegin()->first;
+    return index_meta_pages_.size() == 0 ? 0 : index_meta_pages_.rbegin()->first + 1;
   }
 
   static CatalogMeta *NewInstance(MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(CatalogMeta));
-    return new(buf) CatalogMeta();
+    return new (buf) CatalogMeta();
   }
 
   /**
    * Used only for testing
    */
-  inline std::map<table_id_t, page_id_t> *GetTableMetaPages() {
-    return &table_meta_pages_;
-  }
+  inline std::map<table_id_t, page_id_t> *GetTableMetaPages() { return &table_meta_pages_; }
 
   /**
    * Used only for testing
    */
-  inline std::map<index_id_t, page_id_t> *GetIndexMetaPages() {
-    return &index_meta_pages_;
-  }
+  inline std::map<index_id_t, page_id_t> *GetIndexMetaPages() { return &index_meta_pages_; }
 
-private:
+ private:
   explicit CatalogMeta();
 
-private:
+ private:
   static constexpr uint32_t CATALOG_METADATA_MAGIC_NUM = 89849;
   std::map<table_id_t, page_id_t> table_meta_pages_;
   std::map<index_id_t, page_id_t> index_meta_pages_;
@@ -65,9 +61,9 @@ private:
  *
  */
 class CatalogManager {
-public:
-  explicit CatalogManager(BufferPoolManager *buffer_pool_manager, LockManager *lock_manager,
-                          LogManager *log_manager, bool init);
+ public:
+  explicit CatalogManager(BufferPoolManager *buffer_pool_manager, LockManager *lock_manager, LogManager *log_manager,
+                          bool init);
 
   ~CatalogManager();
 
@@ -78,8 +74,7 @@ public:
   dberr_t GetTables(std::vector<TableInfo *> &tables) const;
 
   dberr_t CreateIndex(const std::string &table_name, const std::string &index_name,
-                      const std::vector<std::string> &index_keys, Transaction *txn,
-                      IndexInfo *&index_info);
+                      const std::vector<std::string> &index_keys, Transaction *txn, IndexInfo *&index_info);
 
   dberr_t GetIndex(const std::string &table_name, const std::string &index_name, IndexInfo *&index_info) const;
 
@@ -89,7 +84,7 @@ public:
 
   dberr_t DropIndex(const std::string &table_name, const std::string &index_name);
 
-private:
+ private:
   dberr_t FlushCatalogMetaPage() const;
 
   dberr_t LoadTable(const table_id_t table_id, const page_id_t page_id);
@@ -98,7 +93,7 @@ private:
 
   dberr_t GetTable(const table_id_t table_id, TableInfo *&table_info);
 
-private:
+ private:
   [[maybe_unused]] BufferPoolManager *buffer_pool_manager_;
   [[maybe_unused]] LockManager *lock_manager_;
   [[maybe_unused]] LogManager *log_manager_;

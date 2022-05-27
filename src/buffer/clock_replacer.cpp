@@ -7,9 +7,7 @@
 ClockReplacer::ClockReplacer(size_t num_pages)
     :second_chance(num_pages,State::EMPTY),
       pointer(0),
-      capacity(num_pages) {
-
-}
+      capacity(num_pages) {}
 
 ClockReplacer::~ClockReplacer() {
   //do nothing

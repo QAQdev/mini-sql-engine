@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "buffer/lru_replacer.h"
+#include "buffer/clock_replacer.h"
 #include "page/page.h"
 #include "page/disk_file_meta_page.h"
 #include "storage/disk_manager.h"

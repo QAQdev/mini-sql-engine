@@ -30,6 +30,7 @@ bool TableHeap::InsertTuple(Row &row, Transaction *txn) {
     }
     // no valid, create new one
     else {
+//      buffer_pool_manager_->UnpinPage(cur_page->GetTablePageId(), false);
       new_page = (TablePage *)buffer_pool_manager_->NewPage(next_page_id_);
       if (new_page == nullptr) {
         buffer_pool_manager_->UnpinPage(cur_page->GetTablePageId(), false);

@@ -1,1 +1,0 @@
-/usr/bin/g++   -fPIC -Wall -Wextra -Werror -march=native -Wno-unused-parameter -Wno-attributes -fPIC -g -O0 -ggdb   CMakeFiles/main.dir/main.cpp.o  -o main  -Wl,-rpath,/root/MiniSQL_v3/build/bin:/root/MiniSQL_v3/build/glog-build libminisql_shared.so ../glog-build/libglogd.so.0.6.0 

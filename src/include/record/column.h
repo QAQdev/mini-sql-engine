@@ -26,7 +26,7 @@ class Column {
 
   bool IsNullable() const { return nullable_; }
 
-  bool IsUnique() const { return  unique_; }
+  bool IsUnique() const { return unique_; }
 
   TypeId GetType() const { return type_; }
 

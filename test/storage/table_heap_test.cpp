@@ -15,13 +15,11 @@ TEST(TableHeapTest, TableHeapSampleTest) {
   // init testing instance
   DBStorageEngine engine(db_file_name);
   SimpleMemHeap heap;
-  const int row_nums = 1000;
+  const int row_nums = 200000;
   // create schema
-  std::vector<Column *> columns = {
-          ALLOC_COLUMN(heap)("id", TypeId::kTypeInt, 0, false, false),
-          ALLOC_COLUMN(heap)("name", TypeId::kTypeChar, 64, 1, true, false),
-          ALLOC_COLUMN(heap)("account", TypeId::kTypeFloat, 2, true, false)
-  };
+  std::vector<Column *> columns = {ALLOC_COLUMN(heap)("id", TypeId::kTypeInt, 0, false, false),
+                                   ALLOC_COLUMN(heap)("name", TypeId::kTypeChar, 64, 1, true, false),
+                                   ALLOC_COLUMN(heap)("account", TypeId::kTypeFloat, 2, true, false)};
   auto schema = std::make_shared<Schema>(columns);
   // create rows
   std::unordered_map<int64_t, Fields *> row_values;
@@ -30,13 +28,14 @@ TEST(TableHeapTest, TableHeapSampleTest) {
     int32_t len = RandomUtils::RandomInt(0, 64);
     char *characters = new char[len];
     RandomUtils::RandomString(characters, len);
-    Fields *fields = new Fields{
-            Field(TypeId::kTypeInt, i),
-            Field(TypeId::kTypeChar, const_cast<char *>(characters), len, true),
-            Field(TypeId::kTypeFloat, RandomUtils::RandomFloat(-999.f, 999.f))
-    };
+    Fields *fields =
+        new Fields{Field(TypeId::kTypeInt, i), Field(TypeId::kTypeChar, const_cast<char *>(characters), len, true),
+                   Field(TypeId::kTypeFloat, RandomUtils::RandomFloat(-999.f, 999.f))};
     Row row(*fields);
-    table_heap->InsertTuple(row, nullptr);
+    if (!table_heap->InsertTuple(row, nullptr)) {
+      int a = 1;
+      a++;
+    }
     row_values[row.GetRowId().Get()] = fields;
     delete[] characters;
   }
@@ -53,4 +52,6 @@ TEST(TableHeapTest, TableHeapSampleTest) {
     delete row_kv.second;
   }
 }
+
+
 

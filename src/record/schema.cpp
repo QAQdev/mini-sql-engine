@@ -6,6 +6,9 @@ uint32_t Schema::SerializeTo(char *buf) const {
   MACH_WRITE_TO(uint32_t, buf, SCHEMA_MAGIC_NUM);
   ofs += sizeof(uint32_t);
 
+  MACH_WRITE_UINT32(buf + ofs, columns_.size());
+  ofs += sizeof(uint32_t);
+
   for (auto &itr : columns_) {
     ofs += itr->SerializeTo(buf + ofs);
   }
@@ -18,7 +21,7 @@ uint32_t Schema::GetSerializedSize() const {
   for (auto &itr : columns_) {
     size += itr->GetSerializedSize();
   }
-  return size + sizeof(uint32_t);
+  return size + 2 * sizeof(uint32_t);
 }
 
 uint32_t Schema::DeserializeFrom(char *buf, Schema *&schema, MemHeap *heap) {
@@ -27,9 +30,17 @@ uint32_t Schema::DeserializeFrom(char *buf, Schema *&schema, MemHeap *heap) {
 
   uint32_t ofs = sizeof(uint32_t);
 
-  for (auto &itr : schema->columns_) {
-    ofs += itr->DeserializeFrom(buf + ofs, itr, heap);
+  auto col_size = MACH_READ_UINT32(buf + ofs);
+  ofs += sizeof(uint32_t);
+
+  std::vector<Column *> columns;
+  for (auto i = 0u; i < col_size; i++) {
+    Column *col;
+    ofs += Column::DeserializeFrom(buf + ofs, col, heap);
+    columns.push_back(col);
   }
+
+  schema = ALLOC_P(heap, Schema)(columns);
 
   return ofs;
 }
