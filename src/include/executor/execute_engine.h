@@ -17,7 +17,8 @@ extern "C" {
  *
  * eg: transaction info, execute result...
  */
-struct ExecuteContext {
+struct ExecuteContext 
+{
   bool flag_quit_{false};
   Transaction *txn_{nullptr};
 };
@@ -76,12 +77,22 @@ private:
   dberr_t ExecuteTrxRollback(pSyntaxNode ast, ExecuteContext *context);
 
   dberr_t ExecuteExecfile(pSyntaxNode ast, ExecuteContext *context);
-
+ 
   dberr_t ExecuteQuit(pSyntaxNode ast, ExecuteContext *context);
 
+  std::vector<RowId> FitchAllRows(std::string tablename);
+
+  std::vector<RowId> SelectPerform(pSyntaxNode ast, 
+          ExecuteContext* context, std::vector<RowId> org_rows);
 private:
   [[maybe_unused]] std::unordered_map<std::string, DBStorageEngine *> dbs_;  /** all opened databases */
   [[maybe_unused]] std::string current_db_;  /** current database */
+  
+  // std::vector<std::string> db_names;
+  // BufferPoolManager* buffer_pool_manager_;
+  // std::string root_db_name = "root";
+  // std::string root_table_name = "dbs";  
+  // int ifInDatabases(std::string da_name); // new added @hz
 };
 
 #endif //MINISQL_EXECUTE_ENGINE_H
