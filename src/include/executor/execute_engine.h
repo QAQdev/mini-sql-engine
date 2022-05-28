@@ -6,9 +6,14 @@
 #include "common/dberr.h"
 #include "common/instance.h"
 #include "transaction/transaction.h"
+#include <vector>
 
-extern "C" {
-#include "parser/parser.h"
+extern "C" 
+{
+extern int yyparse(void);
+extern FILE *yyin;
+#include "../parser/minisql_lex.h"
+#include "../parser/parser.h"
 };
 
 /**
@@ -80,14 +85,38 @@ private:
  
   dberr_t ExecuteQuit(pSyntaxNode ast, ExecuteContext *context);
 
-  std::vector<RowId> FitchAllRows(std::string tablename);
+  std::vector<int64_t> FitchAllRows(std::string tablename);
 
-  std::vector<RowId> SelectPerform(pSyntaxNode ast, 
-          ExecuteContext* context, std::vector<RowId> org_rows);
+  dberr_t SelectPerform(string table_name, string column_name,  
+          string comparator_name, std::vector<int64_t> org_rows, 
+          std::vector<int64_t>& reslt_rows);
+
+  std::vector<int64_t> RowIdMerge(std::vector<int64_t>, std::vector<int64_t>); 
+
+  void SaveDBs();
+
+  dberr_t WherePerform(pSyntaxNode where_node, string tablename, vector<int64_t> org_rows, vector<int64_t> new_rows);
+
+  void PrintRow(TableInfo* tmp_table_info, int64_t rowid, vector<string> print_columns);
+
+  void PrintRows(TableInfo* tmp_table_info, vector<int64_t> rowids, 
+                vector<string> print_columns);
+
+  dberr_t GetField(pSyntaxNode ast, TableInfo* table_info);
+
+  void ExeSelectAll(string tablename);
+
+  bool ifhaveIndex(string tablename, string column_name, IndexInfo*& indexinfo);
+  // 有index返回true并传回指针到indexinfo，没有就false；
+
+  
+
+  // int ifInIndex(TableInfo)
+  // bool GetIndex(vector<string> column)
 private:
   [[maybe_unused]] std::unordered_map<std::string, DBStorageEngine *> dbs_;  /** all opened databases */
   [[maybe_unused]] std::string current_db_;  /** current database */
-  
+  string dbs_name_file = "DBEXEENGINE.txt";
   // std::vector<std::string> db_names;
   // BufferPoolManager* buffer_pool_manager_;
   // std::string root_db_name = "root";

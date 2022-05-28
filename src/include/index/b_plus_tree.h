@@ -23,6 +23,7 @@
  * (3) The structure should shrink and grow dynamically
  * (4) Implement index iterator for range scan
  */
+
 INDEX_TEMPLATE_ARGUMENTS
 class BPlusTree {
   using InternalPage 

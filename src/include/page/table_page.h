@@ -64,7 +64,7 @@ class TablePage : public Page {
 
   bool GetNextTupleRid(const RowId &cur_rid, RowId *next_rid);
 
- private:
+ public:
   uint32_t GetFreeSpacePointer() { return *reinterpret_cast<uint32_t *>(GetData() + OFFSET_FREE_SPACE); }
 
   void SetFreeSpacePointer(uint32_t free_space_pointer) {

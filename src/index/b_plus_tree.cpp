@@ -15,9 +15,14 @@ int leaf_max_size, int internal_max_size):
   buffer_pool_manager_(buffer_pool_manager),
   comparator_(comparator),
   leaf_max_size_(leaf_max_size),
-  internal_max_size_(internal_max_size)
-{
-  this->root_page_id_ = INVALID_PAGE_ID;
+  internal_max_size_(internal_max_size) {
+  auto root_page = reinterpret_cast<IndexRootsPage *>(buffer_pool_manager->FetchPage(INDEX_ROOTS_PAGE_ID));
+
+  if (!root_page->GetRootId(index_id, &this->root_page_id_)) {
+    this->root_page_id_ = INVALID_PAGE_ID;
+  }
+
+  buffer_pool_manager_->UnpinPage(root_page_id_, true);
 }
 
 // new added @hz
@@ -33,7 +38,7 @@ void BPLUSTREE_TYPE::ClrDeletePages()
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::Destroy() 
+void BPLUSTREE_TYPE::Destroy()
 {
   buffer_pool_manager_->UnpinPage(root_page_id_, true);
 }
@@ -54,6 +59,7 @@ bool BPLUSTREE_TYPE::IsEmpty() const
 /*****************************************************************************
  * SEARCH
  *****************************************************************************/
+
 /*
  * Return the only value that associated with input key
  * This method is used for point query
@@ -83,7 +89,6 @@ std::vector<ValueType> &result, Transaction *transaction)
     result.push_back(tmp_value);
     return true;
   }
-  return false;
 }
 
 /*****************************************************************************
@@ -733,9 +738,8 @@ Page *BPLUSTREE_TYPE::FindLeafPage(const KeyType &key, char target_location)
  * updating it.
  */
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::UpdateRootPageId(int insert_record) 
-{
-  // HeaderPage *header_page = 
+void BPLUSTREE_TYPE::UpdateRootPageId(int insert_record) {
+  // HeaderPage *header_page =
   // static_cast<HeaderPage *>
   // (buffer_pool_manager_->FetchPage(HEADER_PAGE_ID));
   // if (insert_record != 0) {
@@ -746,21 +750,18 @@ void BPLUSTREE_TYPE::UpdateRootPageId(int insert_record)
   //   header_page->UpdateRecord(index_name_, root_page_id_);
   // }
   // buffer_pool_manager_->UnpinPage(HEADER_PAGE_ID, true);
-  IndexRootsPage* tmp_index_root_page = 
-  static_cast<IndexRootsPage*>(buffer_pool_manager_->FetchPage(0));
-  
-  if(insert_record != 0)
-  {
+  IndexRootsPage *tmp_index_root_page =
+      reinterpret_cast<IndexRootsPage *>(buffer_pool_manager_->FetchPage(INDEX_ROOTS_PAGE_ID));
+
+  if (insert_record != 0) {
     // tmp_index_root_page->Insert()
     tmp_index_root_page->Insert(index_id_, root_page_id_);
-  }
-  else 
-  {
+  } else {
     tmp_index_root_page->Update(index_id_, root_page_id_);
   }
-  buffer_pool_manager_->UnpinPage(0, true);
+  buffer_pool_manager_->UnpinPage(INDEX_ROOTS_PAGE_ID, true);
 
-  return ;
+  return;
 }
 
 /**

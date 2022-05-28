@@ -8,14 +8,12 @@
 #include "catalog/catalog.h"
 #include "common/config.h"
 #include "common/dberr.h"
-    #include "storage/disk_manager.h"
-  
+#include "storage/disk_manager.h"
 
 class DBStorageEngine {
-public:
-  explicit DBStorageEngine(std::string db_name, bool init = true,
-                           uint32_t buffer_pool_size = DEFAULT_BUFFER_POOL_SIZE)
-          : db_file_name_(std::move(db_name)), init_(init) {
+ public:
+  explicit DBStorageEngine(std::string db_name, bool init = true, uint32_t buffer_pool_size = DEFAULT_BUFFER_POOL_SIZE)
+      : db_file_name_(std::move(db_name)), init_(init) {
     // Init database file if needed
     if (init_) {
       remove(db_file_name_.c_str());
@@ -31,6 +29,7 @@ public:
       ASSERT(bpm_->IsPageFree(INDEX_ROOTS_PAGE_ID), "Header page not free.");
       ASSERT(bpm_->NewPage(id) != nullptr && id == CATALOG_META_PAGE_ID, "Failed to allocate catalog meta page.");
       ASSERT(bpm_->NewPage(id) != nullptr && id == INDEX_ROOTS_PAGE_ID, "Failed to allocate header page.");
+
       bpm_->UnpinPage(CATALOG_META_PAGE_ID, false);
       bpm_->UnpinPage(INDEX_ROOTS_PAGE_ID, false);
     } else {
@@ -45,7 +44,7 @@ public:
     delete disk_mgr_;
   }
 
-public:
+ public:
   DiskManager *disk_mgr_;
   BufferPoolManager *bpm_;
   CatalogManager *catalog_mgr_;
