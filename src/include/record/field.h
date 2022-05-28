@@ -102,6 +102,16 @@ public:
     return value_.float_;
   }
 
+  inline TypeId GetType() const 
+  {
+    return this->type_id_;
+  }
+
+  inline int GetWidth()
+  {
+    return this->len_;
+  }
+
   inline uint32_t SerializeTo(char *buf) const {
     return Type::GetInstance(type_id_)->SerializeTo(*this, buf);
   }
