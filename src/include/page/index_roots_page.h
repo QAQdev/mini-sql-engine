@@ -4,7 +4,6 @@
 #include <string>
 
 #include "common/config.h"
-#include "page.h"
 
 /**
  * Database use the one as index roots page page to store all
@@ -15,12 +14,9 @@
  * | RecordCount (4) | Index_1 id (4) | Index_1 root_id (4) | ... |
  *  -----------------------------------------------------------------
  */
-class IndexRootsPage : public Page
-{
-public:
-  void Init() {
-    count_ = 0;
-  }
+class IndexRootsPage {
+ public:
+  void Init() { count_ = 0; }
 
   bool Insert(const index_id_t index_id, const page_id_t root_id);
 
@@ -33,13 +29,13 @@ public:
 
   int GetIndexCount() { return count_; }
 
-private:
+ private:
   static constexpr int MAX_INDEX_COUNT = (PAGE_SIZE - 4) / 8;
 
   int FindIndex(const index_id_t index_id);
 
-private:
-  int count_;
+ public:
+  int count_ = 0;
   std::pair<index_id_t, page_id_t> roots_[0];
 };
 
