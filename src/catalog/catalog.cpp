@@ -76,8 +76,8 @@ CatalogMeta::CatalogMeta() {}
 
 CatalogManager::CatalogManager(BufferPoolManager *buffer_pool_manager, LockManager *lock_manager,
                                LogManager *log_manager, bool init)
-        : buffer_pool_manager_(buffer_pool_manager), lock_manager_(lock_manager),
-          log_manager_(log_manager), heap_(new SimpleMemHeap()) {
+    : buffer_pool_manager_(buffer_pool_manager), lock_manager_(lock_manager),
+      log_manager_(log_manager), heap_(new SimpleMemHeap()) {
   std::atomic_init(&next_table_id_,0);
   std::atomic_init(&next_index_id_,0);
   if (init) {
@@ -134,7 +134,7 @@ dberr_t CatalogManager::CreateTable(const string &table_name, TableSchema *schem
    * Get table id
    */
   auto table_id = catalog_meta_->GetNextTableId();
-  table_names_[table_name] = table_id; // update table_names_
+  table_names_[table_name] = table_id;  // update table_names_
   /**
    * New a page for table meta data
    */
@@ -143,22 +143,24 @@ dberr_t CatalogManager::CreateTable(const string &table_name, TableSchema *schem
   catalog_meta_->table_meta_pages_[table_id] = page_id;
 
   /**
-   * Construct table meta data
-   */
-  auto table_meta = TableMetadata::Create(table_id, table_name, page_id, schema, heap_);
-
-  table_meta->SerializeTo(table_meta_page->GetData());
-  buffer_pool_manager_->UnpinPage(page_id, true);
-
-  /**
    * Initialize a new table heap
    */
   TableHeap *table_heap = TableHeap::Create(buffer_pool_manager_, schema, txn, log_manager_, lock_manager_, heap_);
 
+  /**
+   * Construct table meta data
+   */
+  /**
+   * VERY IMPORTANT CHANGE!!!
+   */
+  auto table_meta = TableMetadata::Create(table_id, table_name, table_heap->GetFirstPageId(), schema, heap_);
+  table_meta->SerializeTo(table_meta_page->GetData());
+  buffer_pool_manager_->UnpinPage(page_id, true);
+
   table_info = TableInfo::Create(heap_);
   table_info->Init(table_meta, table_heap);
 
-  tables_[table_id] = table_info; // update tables_
+  tables_[table_id] = table_info;  // update tables_
 
   return DB_SUCCESS;
 }

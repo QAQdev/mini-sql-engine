@@ -14,12 +14,12 @@ using namespace std;
 
 ExecuteEngine::ExecuteEngine() 
 {
-  // buffer_pool_manager_ = new BufferPoolManager();
-  #ifdef ENABLE_EXECUTE_DEBUG
+// buffer_pool_manager_ = new BufferPoolManager();
+#ifdef ENABLE_EXECUTE_DEBUG
   LOG(INFO) << "ExecuteEngine" << std::endl;
-  // fstream tmp_name_file_stream(dbs_name_file, ios::out);
-  // tmp_name_file_stream.close();
-  #endif
+// fstream tmp_name_file_stream(dbs_name_file, ios::out);
+// tmp_name_file_stream.close();
+#endif
   // string name_db = "db";
   // // DBStorageEngine* new_engine = new DBStorageEngine(name_db, true);
   // // new_engine->~DBStorageEngine();
@@ -37,6 +37,7 @@ ExecuteEngine::ExecuteEngine()
       cout << "Fail to init." << endl;
     }
   }
+
   string db_name = "";
   while(getline(name_file_stream, db_name))
   {
@@ -221,7 +222,7 @@ dberr_t ExecuteEngine::ExecuteCreateTable(pSyntaxNode ast, ExecuteContext *conte
   string new_table_name(ast->child_->val_);
   TableInfo* new_table_info;
   dberr_t find_table =
-  current_db_engine->catalog_mgr_->GetTable(new_table_name, new_table_info);
+      current_db_engine->catalog_mgr_->GetTable(new_table_name, new_table_info);
   if(find_table == DB_SUCCESS)
   {
     cout << "table exists" << endl;
@@ -287,12 +288,12 @@ dberr_t ExecuteEngine::ExecuteCreateTable(pSyntaxNode ast, ExecuteContext *conte
       if(if_unique[column_name_stp] || if_primary_key[column_name_stp])
       {
         new_column = new Column(column_name_stp, TypeId::kTypeInt, column_index_counter, 
-                                                        false, true);
+                                false, true);
       }
       else 
       {
         new_column = new Column(column_name_stp, TypeId::kTypeInt, column_index_counter, 
-                                                        false, false);
+                                false, false);
       }
     }
     else if(type_of_column[column_name_stp] == "float")
@@ -300,26 +301,22 @@ dberr_t ExecuteEngine::ExecuteCreateTable(pSyntaxNode ast, ExecuteContext *conte
       if(if_unique[column_name_stp] || if_primary_key[column_name_stp])
       {
         new_column = new Column(column_name_stp, TypeId::kTypeFloat, column_index_counter, 
-                                                        false, true);
+                                false, true);
       }
       else 
       {
         new_column = new Column(column_name_stp, TypeId::kTypeFloat, column_index_counter, 
-                                                        false, false);
+                                false, false);
       } 
     }
-    else if(type_of_column[column_name_stp] == "char")
-    {
-      if(if_unique[column_name_stp] || if_primary_key[column_name_stp])
-      {
-        new_column = new Column(column_name_stp, TypeId::kTypeChar, char_size[column_name_stp], column_index_counter, 
-                                                        false, true);
+    else if(type_of_column[column_name_stp] == "char") {
+      if (if_unique[column_name_stp] || if_primary_key[column_name_stp]) {
+        new_column = new Column(column_name_stp, TypeId::kTypeChar, char_size[column_name_stp], column_index_counter,
+                                false, true);
+      } else {
+        new_column = new Column(column_name_stp, TypeId::kTypeChar, char_size[column_name_stp], column_index_counter,
+                                false, false);
       }
-      else 
-      {
-        new_column = new Column(column_name_stp, TypeId::kTypeChar, column_index_counter, 
-                                                        false, false);
-      } 
     }
     else 
     {
@@ -332,7 +329,7 @@ dberr_t ExecuteEngine::ExecuteCreateTable(pSyntaxNode ast, ExecuteContext *conte
   Schema* new_schema = new Schema(tmp_column_vec);
   dberr_t if_create_success;
   if_create_success = current_db_engine->catalog_mgr_->CreateTable(new_table_name, 
-                                        new_schema, nullptr, tmp_table_info);
+                                                                   new_schema, nullptr, tmp_table_info);
   if(if_create_success != DB_SUCCESS)
     return if_create_success;
   CatalogManager* current_CMgr = dbs_[current_db_]->catalog_mgr_;
@@ -344,8 +341,8 @@ dberr_t ExecuteEngine::ExecuteCreateTable(pSyntaxNode ast, ExecuteContext *conte
       vector<string> index_columns_stp = {column_name_stp};
       IndexInfo* stp_index_info;
       dberr_t if_create_index_success 
-      = current_CMgr->CreateIndex(new_table_name, stp_index_name, index_columns_stp, 
-                                            nullptr, stp_index_info);
+          = current_CMgr->CreateIndex(new_table_name, stp_index_name, index_columns_stp,
+                                      nullptr, stp_index_info);
       if(if_create_index_success != DB_SUCCESS)
         return if_create_index_success;
     }
@@ -428,7 +425,7 @@ dberr_t ExecuteEngine::ExecuteCreateIndex(pSyntaxNode ast, ExecuteContext *conte
   }
   IndexInfo* new_indexinfo;
   dberr_t if_createindex_success = current_CMgr->CreateIndex(table_name, 
-                              index_name, vec_index_colum_lists, nullptr, new_indexinfo);
+                                                             index_name, vec_index_colum_lists, nullptr, new_indexinfo);
   if(if_createindex_success != DB_SUCCESS)
     return if_createindex_success;
   return DB_SUCCESS;
@@ -475,7 +472,7 @@ dberr_t ExecuteEngine::ExecuteSelect(pSyntaxNode ast, ExecuteContext *context)
   CatalogManager* current_CMgr = dbs_[current_db_]->catalog_mgr_;
   TableInfo* select_table_info;
   dberr_t if_select_table_success
-  = current_CMgr->GetTable(select_table_name, select_table_info);
+      = current_CMgr->GetTable(select_table_name, select_table_info);
   if(if_select_table_success != DB_SUCCESS)
     return if_select_table_success;
   Schema* select_table_schema = select_table_info->GetSchema();
@@ -489,7 +486,7 @@ dberr_t ExecuteEngine::ExecuteSelect(pSyntaxNode ast, ExecuteContext *context)
       string tmp_column(kNIdfiniers->val_);
       uint32_t tmp_column_index;
       dberr_t if_get_column_success
-      = select_table_schema->GetColumnIndex(tmp_column, tmp_column_index);
+          = select_table_schema->GetColumnIndex(tmp_column, tmp_column_index);
       if(if_get_column_success != DB_SUCCESS)
         return if_get_column_success;
       column_names.push_back(tmp_column);
@@ -503,7 +500,7 @@ dberr_t ExecuteEngine::ExecuteSelect(pSyntaxNode ast, ExecuteContext *context)
   vector<int64_t> all_rows = FitchAllRows(select_table_name);
   vector<int64_t> rows_selected;
   dberr_t if_whereperform_success 
-  = WherePerform(ast, select_table_name, all_rows, rows_selected);
+      = WherePerform(ast, select_table_name, all_rows, rows_selected);
   if(if_whereperform_success != DB_SUCCESS)
     return DB_FAILED;
   for(int64_t val_rowid: rows_selected)
@@ -522,17 +519,17 @@ dberr_t ExecuteEngine::ExecuteInsert(pSyntaxNode ast, ExecuteContext *context)
   LOG(INFO) << "ExecuteInsert" << std::endl;
 #endif
   string table_name = ast->child_->val_;
-// 语法树还没处理
+  // 语法树还没处理
   // return DB_SUCCESS;
   vector<Field> newfields;
   Row newrow(newfields);
   TableInfo* target_table_info;
   dberr_t if_gettable_success =
-  dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
+      dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
   if(if_gettable_success != DB_SUCCESS)
     return if_gettable_success;
   dberr_t if_getfield_success = 
-  GetField(ast->child_->next_->child_, target_table_info);
+      GetField(ast->child_->next_->child_, target_table_info);
   if(if_getfield_success != DB_SUCCESS)
   {
     cout << "fail to insert" << endl;
@@ -547,12 +544,12 @@ dberr_t ExecuteEngine::ExecuteDelete(pSyntaxNode ast, ExecuteContext *context)
 #ifdef ENABLE_EXECUTE_DEBUG
   LOG(INFO) << "ExecuteDelete" << std::endl;
 #endif
-// 语法树还没处理
+  // 语法树还没处理
   string table_name;
   vector<int64_t> target_rows;
   TableInfo* target_table_info;
   dberr_t if_gettable_success =
-  dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
+      dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
   if(if_gettable_success != DB_SUCCESS)
     return if_gettable_success;
   TableHeap* target_table_heap = target_table_info->GetTableHeap();
@@ -575,14 +572,14 @@ dberr_t ExecuteEngine::ExecuteUpdate(pSyntaxNode ast, ExecuteContext *context)
 #ifdef ENABLE_EXECUTE_DEBUG
   LOG(INFO) << "ExecuteUpdate" << std::endl;
 #endif
-// 语法树还没处理
+  // 语法树还没处理
   string table_name;
   vector<Field> new_field;
   Row new_row(new_field);
   vector<RowId> target_rows;
   TableInfo* target_table_info;
   dberr_t if_gettable_success =
-  dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
+      dbs_[current_db_]->catalog_mgr_->GetTable(table_name, target_table_info);
   if(if_gettable_success != DB_SUCCESS)
     return if_gettable_success;
   TableHeap* target_table_heap = target_table_info->GetTableHeap();
@@ -656,7 +653,7 @@ dberr_t ExecuteEngine::ExecuteExecfile(pSyntaxNode ast, ExecuteContext *context)
     { 
       if(exefstream.eof())
       {
-        delete cmd;
+        delete []cmd;
         return DB_SUCCESS;
       }
       // exefstream >> tmp_char;
@@ -692,12 +689,12 @@ dberr_t ExecuteEngine::ExecuteExecfile(pSyntaxNode ast, ExecuteContext *context)
     } 
     else 
     {
-// #ifdef ENABLE_PARSER_DEBUG
+      // #ifdef ENABLE_PARSER_DEBUG
       // printf("[INFO] Sql syntax parse ok!\n");
       // SyntaxTreePrinter printer(MinisqlGetParserRootNode());
       // MinisqlGetParserRootNode()->
       // printer.PrintTree(syntax_tree_file_mgr[syntax_tree_id++]);
-// #endif
+      // #endif
     }
 
     this->Execute(MinisqlGetParserRootNode(), context);
@@ -733,7 +730,7 @@ dberr_t ExecuteEngine::ExecuteQuit(pSyntaxNode ast, ExecuteContext *context)
 
 
 dberr_t ExecuteEngine::SelectPerform(string table_name, string column_name, 
-          string comparator_name, std::vector<int64_t> org_rows, std::vector<int64_t>& reslt_rows)
+                                     string comparator_name, std::vector<int64_t> org_rows, std::vector<int64_t>& reslt_rows)
 {
   vector<int64_t> selected_rows;
   reslt_rows = selected_rows;
@@ -780,7 +777,7 @@ void ExecuteEngine::SaveDBs()
 dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename, vector<int64_t> org_rows, vector<int64_t> new_rows)
 {
   if(condition_node->type_ != SyntaxNodeType::kNodeCompareOperator
-   ||condition_node->type_ != SyntaxNodeType::kNodeConnector)
+      ||condition_node->type_ != SyntaxNodeType::kNodeConnector)
     return DB_FAILED;
   if(condition_node->type_ == SyntaxNodeType::kNodeCompareOperator)
   {
@@ -788,7 +785,7 @@ dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename
     string column_name(condition_node->child_->val_);
 
     dberr_t if_select_success 
-    = SelectPerform(tablename, column_name, cmp_name, org_rows, new_rows);
+        = SelectPerform(tablename, column_name, cmp_name, org_rows, new_rows);
     return if_select_success;
   }
   else 
@@ -798,11 +795,11 @@ dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename
     {
       vector<int64_t> tmp_new_rows;
       dberr_t if_whereperform_success 
-      = WherePerform(condition_node->next_, tablename, org_rows, tmp_new_rows);
+          = WherePerform(condition_node->next_, tablename, org_rows, tmp_new_rows);
       if(if_whereperform_success != DB_SUCCESS)
         return if_whereperform_success;
       if_whereperform_success
-      = WherePerform(condition_node->child_, tablename, tmp_new_rows, new_rows);
+          = WherePerform(condition_node->child_, tablename, tmp_new_rows, new_rows);
       return if_whereperform_success;
     }
   }
@@ -819,7 +816,7 @@ void ExecuteEngine::PrintRow(TableInfo* tmp_table_info, int64_t rowid, vector<st
     Row row(r_rowid);
     tmp_table_info->GetTableHeap()->GetTuple(&row, nullptr);
     dberr_t if_getcolumn_success =
-    tmp_table_info->GetSchema()->GetColumnIndex(column_name, index_val);
+        tmp_table_info->GetSchema()->GetColumnIndex(column_name, index_val);
     if(if_getcolumn_success == DB_COLUMN_NAME_NOT_EXIST)
     {
       cout << endl << "column '" << column_name << "' does not exist." << endl;
@@ -846,7 +843,7 @@ void ExecuteEngine::PrintRow(TableInfo* tmp_table_info, int64_t rowid, vector<st
 }
 
 void ExecuteEngine::PrintRows(TableInfo* tmp_table_info, vector<int64_t> rowids, 
-                vector<string> print_columns)
+                              vector<string> print_columns)
 {
   for(int64_t rowid: rowids)
   {
@@ -862,27 +859,27 @@ dberr_t ExecuteEngine::GetField(pSyntaxNode ast, TableInfo* table_info)
   for(Column* tmp_column: vec_columns)
   {
     if(ast == nullptr
-      ||(ast->type_ != SyntaxNodeType::kNodeString
-      &&ast->type_ != SyntaxNodeType::kNodeNumber))
+        ||(ast->type_ != SyntaxNodeType::kNodeString
+            &&ast->type_ != SyntaxNodeType::kNodeNumber))
     {
       cout << "get  field wrong" << endl;
       return DB_FAILED;
     }
     if(ast->type_ == SyntaxNodeType::kNodeString
-      && tmp_column->GetType() == TypeId::kTypeChar)
+        && tmp_column->GetType() == TypeId::kTypeChar)
     {
       Field tmp_f(TypeId::kTypeChar, const_cast<char *>(ast->val_), tmp_column->GetLength(), true);
       fields.push_back(tmp_f);
     }
     else if(ast->type_ == SyntaxNodeType::kNodeNumber
-      && tmp_column->GetType() == TypeId::kTypeFloat)
+             && tmp_column->GetType() == TypeId::kTypeFloat)
     {
       float val = atof(ast->val_);
       Field tmp_f(TypeId::kTypeFloat, val);
       fields.push_back(tmp_f);
     }
     else if(ast->type_ == SyntaxNodeType::kNodeNumber
-      && tmp_column->GetType() == TypeId::kTypeInt)
+             && tmp_column->GetType() == TypeId::kTypeInt)
     {
       int val = atof(ast->val_);
       Field tmp_f(TypeId::kTypeInt, val);
@@ -908,14 +905,14 @@ void ExecuteEngine::ExeSelectAll(string tablename)
   CatalogManager* cunnernt_CMger = dbs_[current_db_]->catalog_mgr_;
   TableInfo* tmp_table_info;
   dberr_t if_gettable_success =
-  cunnernt_CMger->GetTable(tablename, tmp_table_info);
+      cunnernt_CMger->GetTable(tablename, tmp_table_info);
   if(if_gettable_success != DB_SUCCESS)
   {
     cout << "select all fail" << endl;
     return ;
   }
   vector<Column*> columns =
-  tmp_table_info->GetSchema()->GetColumns();
+      tmp_table_info->GetSchema()->GetColumns();
   vector<string> str_columns;
   for(Column* tmp_column: columns)
   {
