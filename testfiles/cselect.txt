@@ -1,0 +1,24 @@
+select * from account where id = 12500011;
+select * from account where balance = 462.55;
+select * from account where name = "name56789"; 0.09375
+select * from account where id <> 12500013;
+select * from account where balance <> 66.66;
+select * from account where name <> "123";
+select id, name from account where balance = 666.64 and id = 12500008;
+
+create index idx01 on account(name);
+select * from account where name = "name56789"; 0.0625
+select * from account where name = "name45678"; 0.0625
+delete from account where name = "name45678";
+insert into account values(32001, "name45678", 666.66);
+drop index idx01;
+select * from account where name = "name56789"; 0.1009375
+select * from account where name = "name45678"; 0.09375
+
+delete from account where balance = 666.66; 0.109375
+select * from account where balance = 666.66; 
+delete from account;
+select * from account;
+drop table account;
+show tables;
+show indexes;

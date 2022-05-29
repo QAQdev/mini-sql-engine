@@ -50,6 +50,7 @@ private:
  */
 class TableInfo {
  public:
+  TableMetadata *table_meta_;
   static TableInfo *Create(MemHeap *heap) {
     void *buf = heap->Allocate(sizeof(TableInfo));
     return new (buf) TableInfo();
@@ -76,9 +77,9 @@ class TableInfo {
 
  private:
   explicit TableInfo() : heap_(new SimpleMemHeap()){};
-
+  
  private:
-  TableMetadata *table_meta_;
+  
   TableHeap *table_heap_;
   MemHeap *heap_; /** store all objects allocated in table_meta and table heap */
 };

@@ -78,7 +78,14 @@ int main(int argc, char **argv)
     }
 
     ExecuteContext context;
+    clock_t start_time = clock();
+    
     engine.Execute(MinisqlGetParserRootNode(), &context);
+    clock_t end_time;
+    end_time = clock();
+    double spt_time=(double)(end_time-start_time)/CLOCKS_PER_SEC;
+    cout << "time of " << spt_time << " s" << endl;
+
     sleep(1);
 
     // clean memory after parse
