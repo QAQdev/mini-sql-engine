@@ -1,0 +1,3 @@
+show databases;
+use db0;
+select * from table;

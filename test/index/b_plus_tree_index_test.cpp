@@ -49,7 +49,8 @@ TEST(BPlusTreeTests, BPlusTreeIndexSimpleTest) {
   const TableSchema table_schema(columns);
   auto *index_schema = Schema::ShallowCopySchema(&table_schema, index_key_map, &heap);
   auto *index = ALLOC(heap, BP_TREE_INDEX)(0, index_schema, engine.bpm_);
-  for (int i = 0; i < 10; i++) {
+  int n = 10000;
+  for (int i = 0; i < n; i++) {
     std::vector<Field> fields{
             Field(TypeId::kTypeInt, i),
             Field(TypeId::kTypeChar, const_cast<char *>("minisql"), 7, true)
@@ -60,7 +61,7 @@ TEST(BPlusTreeTests, BPlusTreeIndexSimpleTest) {
   }
   // Test Scan
   std::vector<RowId> ret;
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < n; i++) {
     std::vector<Field> fields{
             Field(TypeId::kTypeInt, i),
             Field(TypeId::kTypeChar, const_cast<char *>("minisql"), 7, true)

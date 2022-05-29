@@ -61,7 +61,7 @@ public:
   }
 
   // copy constructor
-  explicit Field(const Field &other) {
+  Field(const Field &other) {
     type_id_ = other.type_id_;
     len_ = other.len_;
     is_null_ = other.is_null_;

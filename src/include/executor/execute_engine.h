@@ -88,14 +88,14 @@ private:
   std::vector<int64_t> FitchAllRows(std::string tablename);
 
   dberr_t SelectPerform(string table_name, string column_name,  
-          string comparator_name, std::vector<int64_t> org_rows, 
+          string comparator_name, char* cval, std::vector<int64_t> org_rows, 
           std::vector<int64_t>& reslt_rows);
 
   std::vector<int64_t> RowIdMerge(std::vector<int64_t>, std::vector<int64_t>); 
 
   void SaveDBs();
 
-  dberr_t WherePerform(pSyntaxNode where_node, string tablename, vector<int64_t> org_rows, vector<int64_t> new_rows);
+  dberr_t WherePerform(pSyntaxNode where_node, string tablename, vector<int64_t> org_rows, vector<int64_t>& new_rows);
 
   void PrintRow(TableInfo* tmp_table_info, int64_t rowid, vector<string> print_columns);
 
@@ -109,7 +109,23 @@ private:
   bool ifhaveIndex(string tablename, string column_name, IndexInfo*& indexinfo);
   // 有index返回true并传回指针到indexinfo，没有就false；
 
+  // =
+  int ifSameVal(TableInfo* table_info, string cloumn_name, string val, int64_t rowid);
+
+  // <=
+  int ifLessEque(TableInfo* table_info, string column_name, string val, int64_t rowid);
+
+  // <
+  int ifLess(TableInfo* table_info, string column_name, string val, int64_t rowid);
+
+  // >=
+  int ifBiggerEque(TableInfo* table_info, string column_name, string val, int64_t rowid);
+
+  // >
+  int ifBigger(TableInfo* table_info, string column_name, string val, int64_t rowid);
   
+  int ifUnique(TableInfo* table_info, string column_name);
+
 
   // int ifInIndex(TableInfo)
   // bool GetIndex(vector<string> column)

@@ -72,6 +72,10 @@ INDEX_TEMPLATE_ARGUMENTS
 bool BPLUSTREE_TYPE::GetValue(const KeyType &key, 
 std::vector<ValueType> &result, Transaction *transaction) 
 {
+  if(this->IsEmpty())
+  {
+    return false;
+  }
   Page* leaf_page = this->FindLeafPage(key);
   LeafPage *leaf_node = reinterpret_cast<LeafPage *>(leaf_page->GetData());
 
