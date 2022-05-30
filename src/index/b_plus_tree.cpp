@@ -6,6 +6,7 @@
 #include "index/generic_key.h"
 #include "page/index_roots_page.h"
 #include <algorithm>
+#include <stack>
 
 INDEX_TEMPLATE_ARGUMENTS
 BPLUSTREE_TYPE::BPlusTree(index_id_t index_id, 
@@ -21,7 +22,7 @@ int leaf_max_size, int internal_max_size):
   if (!root_page->GetRootId(index_id, &this->root_page_id_)) {
     this->root_page_id_ = INVALID_PAGE_ID;
   }
-
+  buffer_pool_manager->UnpinPage(INDEX_ROOTS_PAGE_ID, true);
   buffer_pool_manager_->UnpinPage(root_page_id_, true);
 }
 
@@ -38,9 +39,47 @@ void BPLUSTREE_TYPE::ClrDeletePages()
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::Destroy()
-{
-  buffer_pool_manager_->UnpinPage(root_page_id_, true);
+void BPLUSTREE_TYPE::Destroy() {
+  // if(IsEmpty()){
+  //   return;
+  // }
+  // std::stack<int> s;
+  // InternalPage* page=reinterpret_cast<InternalPage*>(buffer_pool_manager_->FetchPage(root_page_id_));
+  // int index=0;//get the root page
+  // if(page->GetPageType()==IndexPageType::LEAF_PAGE){
+  //   buffer_pool_manager_->UnpinPage(root_page_id_,false);
+  //   buffer_pool_manager_->DeletePage(root_page_id_);
+  //   return;//if the root is leaf,delete it directly and return back
+  // }
+
+  // while(true){
+  //   if(index==page->GetSize()){
+  //     if(ReturnFatherState(index,page,s)){
+  //       break;//all the children of the internal page has been deleted
+  //     }//if this page is root,end
+  //   }else{
+  //     page_id_t son=reinterpret_cast<page_id_t>(page->ValueAt(index));
+  //     InternalPage* temp=reinterpret_cast<InternalPage*>(buffer_pool_manager_->FetchPage(son));
+  //     if(temp->GetPageType()==IndexPageType::LEAF_PAGE){
+  //       buffer_pool_manager_->UnpinPage(son,false);
+  //       int size=page->GetSize();
+  //       for(int i=0;i<size;i++){
+  //         buffer_pool_manager_->DeletePage(page->ValueAt(i));
+  //       }//if its son is leaf,delete all of them
+  //       if(ReturnFatherState(index,page,s)){
+  //         break;//delete itself and return to its father
+  //       }
+  //     }else{
+  //       s.push(index);
+  //       index=0;
+  //       buffer_pool_manager_->UnpinPage(page->GetPageId(),false);
+  //       page=temp;//continue pro-travel
+  //     }
+  //   }
+  // }
+
+  // root_page_id_=INVALID_PAGE_ID;
+  // UpdateRootPageId(0);//delete the information in the index page
 }
 
 /*
@@ -504,6 +543,7 @@ void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index)
       neighbor_leaf_node->MoveLastToFrontOf(leaf_node);
       parent->SetKeyAt(index, leaf_node->KeyAt(0));
     }
+    buffer_pool_manager_->UnpinPage(parent->GetPageId(), true);
   } 
   else 
   {
@@ -523,6 +563,7 @@ void BPLUSTREE_TYPE::Redistribute(N *neighbor_node, N *node, int index)
         parent->KeyAt(index), buffer_pool_manager_);
       parent->SetKeyAt(index, internal_node->KeyAt(0));
     }
+    buffer_pool_manager_->UnpinPage(parent->GetPageId(), true);
   }
 
   return ;

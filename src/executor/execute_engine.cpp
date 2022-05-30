@@ -452,7 +452,6 @@ dberr_t ExecuteEngine::ExecuteCreateIndex(pSyntaxNode ast, ExecuteContext *conte
   IndexInfo* new_indexinfo;
   dberr_t if_createindex_success = current_CMgr->CreateIndex(table_name, 
         index_name, vec_index_colum_lists, nullptr, new_indexinfo);
-  
   if(if_createindex_success != DB_SUCCESS)
     return if_createindex_success;
   return DB_SUCCESS;
@@ -572,7 +571,6 @@ dberr_t ExecuteEngine::ExecuteSelect(pSyntaxNode ast, ExecuteContext *context)
   vector<int64_t> rows_selected;
   dberr_t if_whereperform_success 
       = WherePerform(where_cmd, select_table_name, all_rows, rows_selected);
-  
   if(if_whereperform_success != DB_SUCCESS)
     return DB_FAILED;
   PrintRows(select_table_info, rows_selected, column_names);
@@ -612,9 +610,7 @@ dberr_t ExecuteEngine::ExecuteDelete(pSyntaxNode ast, ExecuteContext *context)
   LOG(INFO) << "ExecuteDelete" << std::endl;
 #endif
   // 语法树还没处理
-
   string table_name = ast->child_->val_;
-
   vector<int64_t> target_rows;
   pSyntaxNode conditon_cmd = ast->child_->next_;
   if(conditon_cmd != nullptr)
@@ -1045,7 +1041,6 @@ dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename
   }
   if(condition_node->type_ != SyntaxNodeType::kNodeCompareOperator
       &&condition_node->type_ != SyntaxNodeType::kNodeConnector)
-
     return DB_FAILED;
   if(condition_node->type_ == SyntaxNodeType::kNodeCompareOperator)
   {
@@ -1055,7 +1050,6 @@ dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename
 
     dberr_t if_select_success 
         = SelectPerform(tablename, column_name, cmp_name, val, org_rows, new_rows);
-
     return if_select_success;
   }
   else 
@@ -1065,13 +1059,11 @@ dberr_t ExecuteEngine::WherePerform(pSyntaxNode condition_node, string tablename
     {
       vector<int64_t> tmp_new_rows;
       dberr_t if_whereperform_success 
-
           = WherePerform(condition_node->child_, tablename, org_rows, tmp_new_rows);
       if(if_whereperform_success != DB_SUCCESS)
         return if_whereperform_success;
       if_whereperform_success
           = WherePerform(condition_node->child_->next_, tablename, tmp_new_rows, new_rows);
-
       return if_whereperform_success;
     }
   }
